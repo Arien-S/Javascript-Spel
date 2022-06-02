@@ -1,0 +1,14 @@
+
+
+!WARNING! INNAN NI BÖRJAR SPELA SPELET LÄS DETTA!
+
+    SÄNK VOLYMEN OM DU INTE VILL BLI DÖV
+
+
+
+Controller
+
+WASD = Styr Blue Knight
+Piltangenter = Styr Green Knight
+Spacebar = Sjuter
+Mus = Sikta

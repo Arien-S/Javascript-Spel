@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+    <link rel="stylesheet" href="style.css">
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+   </head>
+   <body>
+    
+    <!-- visar text spelare 1 hp -->
+    <h1>P1</h1> 
+    <!-- visar text för spelare 2 hp -->
+    <h1>P2</h1> 
+    <!-- visar text för score -->
+    <h2>Score</h2> 
+     <!-- visar score numret *har med en sak längre den i koden att göra -->
+    <h3 id="Score">0</h3> 
+    <!-- visar boss namn -->
+    <h4>Ghost King Bob</h4> 
+    <h5>[Tip]<br>Hit is horn its his weakspot!<br>Enchant your sword by collecting crystal orbs!</h5>
+        
+      <script src="http://koda.nu/simple.js" >
+
+        //skapar Bossen med stats
+        var Ghosts = { 
+            x: 1000,
+            y: 500,
+            speed: 7,
+            hp: 2000,
+            dmg: 8,
+            points: 0
+        };
+         
+        //skapar spelare 1 med stats
+         var Knight = { 
+            x: 1300,
+            y: 100,
+            speed: 9.5,
+            hp: 200,
+            dmg: 3,
+            points: 0
+        };
+
+        //skapar spelare 2 med stats
+        var Knight_2 = { 
+            x: 1100,
+            y: 100,
+            speed: 9.5,
+            hp: 200,
+            dmg: 3,
+            points: 0
+        };
+
+        //skapar en upgrade som ökar ens speed senare
+        var upgrade = { 
+            active: true,
+            x: random(totalWidth),
+            y: random(totalHeight)
+        }
+
+        //lägger in ljudeffekter och musik
+        var BackgroundAudio = new Audio('Shattered Pixel Dungeon (New OST) - Sewers Boss.mp3');
+        BackgroundAudio.play(); 
+        var DamageTakenAudio = new Audio('DamageTaken.mp3');
+        
+         
+
+
+        //skapar en funktion som updateras hela tiden
+         function update () {
+             clearScreen();
+
+            //skapar en upgrade
+             if (upgrade.active == true) 
+             //skapar circeln som en upgrade
+                circle(upgrade.x, upgrade.y, 25, "yellow"); 
+                //om kordinaterna på cikeln och knight/knight är tilräckligt nära varandra så adderas värden till hpet,dmg samt speed på Knight varibeln
+                if (distance(Knight.x, Knight.y, upgrade.x,upgrade.y) < 35 || distance(Knight_2.x, Knight_2.y, upgrade.x,upgrade.y) < 100) 
+                {
+                    Knight.dmg += 4;
+                    Knight.speed += 3;
+                    Knight.hp += 15;
+                    upgrade.active = false;     //försvinner sedan
+                };
+
+             //lägger ut mina spelare
+             picture(Knight_2.x, Knight_2.y, "GreenKnight.png");   
+             picture(Knight.x, Knight.y, "BlueKnight.png");
+
+            
+            //gör så att man kan controllera båda spelarna med wasd och piltangenter
+
+            if (keyboard.d)
+                Knight.x += Knight.speed;
+            if (keyboard.a)
+                Knight.x -= Knight.speed;
+            if (keyboard.s)
+                Knight.y += Knight.speed;
+            if (keyboard.w)
+                Knight.y -= Knight.speed;
+
+            if (keyboard.right)
+                Knight_2.x += Knight_2.speed;
+            if (keyboard.left)
+                Knight_2.x -= Knight_2.speed;
+            if (keyboard.down)
+                Knight_2.y += Knight_2.speed;
+            if (keyboard.up)
+                Knight_2.y -= Knight_2.speed;
+
+            
+
+                
+                //skapar healthbars till bossen och spelarna som beror på hpet av spelarna/Bossen
+                rectangle(2300, 40, Knight.hp * (Knight.hp/Knight.hp), 30, "blue");
+                rectangle(2300, 100, Knight_2.hp * (Knight_2.hp/Knight_2.hp), 30, "green"); 
+                rectangle(300, 1290, Ghosts.hp * (Ghosts.hp/Ghosts.hp), 30, "red"); 
+                
+
+                //lägger in bossen 
+                 picture(Ghosts.x, Ghosts.y, "Ghosts.png");
+         
+                 //Gör att bossen följer efter spelaren
+                 if (Ghosts.x < Knight.x) {
+                     Ghosts.x += Ghosts.speed;
+                    }
+                 else { Ghosts.x -= Ghosts.speed;}
+         
+                 if (Ghosts.y < Knight.y)
+                     Ghosts.y += Ghosts.speed;
+                     
+                 else { Ghosts.y -= Ghosts.speed;}
+
+
+                 //Gör att spelaren tar skada om för nära bossen och dör om hp blir 0
+                 
+                 if (distance(Knight, Ghosts) < 120) {
+                     Knight.hp -= 3.5
+                     DamageTakenAudio.play(); 
+
+                 if (Knight.hp <= 0)
+                    window.location.href = "Menu.html";
+
+                
+                      
+                    
+                    
+                 }
+                 //Gör att bossen dör om hp = 0 och man kommer till en victory screen
+
+                 if (Ghosts.hp <= 0)
+                    window.location.href = "Victory.html";
+                 
+                 //gör så att spelare 2 tar skada om för nära ghost och dör om hp <= 0
+                 if (distance(Knight_2, Ghosts) < 120) {
+                     Knight_2.hp -= 3.5
+                 //spelar ljud varje gång man tar skada
+                     DamageTakenAudio.play(); 
+                
+
+                 if (Knight_2.hp <= 0)
+                    window.location.href = "Menu.html";
+                 }
+
+                 
+                //Gör att om man clickar space och håller musen på bossen så tar man bort hp från dess variabel
+                 if (keyboard.space) {
+                    var DamagedDealt = new Audio('HITMARKER.mp3'); //gör en variabel för ljud som spelas när man klickar space
+                    DamagedDealt.play();
+                    console.log("Funkar 1?=")
+                    //Kollar kordinaterna på både mus och ghost och om de är tilräckligt nära så
+                    //Tas hp bort från ghosts variabel i den mängs Knights variabel gör i skada
+                    if (distance(mouse.x,mouse.y, Ghosts.x,Ghosts.y) < 100) {  
+                        console.log("Funkar 2?")                               
+                        Ghosts.hp -= Knight.dmg;
+                        //Poäng läggs till i html under score som jag gjorde i början
+                        Knight.points += 1;     
+                        // Visar score i html 
+                        document.getElementById("Score").innerHTML = Knight.points; 
+
+                    
+                    };
+
+                    
+
+                    
+                };
+
+
+            
+
+                 
+             }
+
+             
+                
+
+                
+            
+
+                
+                
+               
+             
+
+             
+
+             
+            
+         
+         
+      </script>
+   </body>
+</html>

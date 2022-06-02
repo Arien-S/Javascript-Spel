@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <p id="Points"></p> 
+    <script src="https://koda.nu/simple.js">
+        
+        // Debug Variabel som inte används i slutliga versionen
+        var touchcount = 0;
+        var numberofcells = 1;
+        //skapar en lista som alla celler kommer att lagras i
+        var Cells = [];
+        var i = 0;
+
+        // skapar två listor där första och andra spelarens position samt fart sparas
+        var plr1 = {
+            x: 100,
+            y: 100,
+            speed: 18,
+            maxhp: 200,
+            hp: 200,
+            dmg: 8,
+            points: 0
+        };
+
+        var plr2 = {
+            x: 120,
+            y: 50,
+            speed: 15
+        };
+
+        var upgrade = {
+            active: true,
+            x: random(totalWidth),
+            y: random(totalHeight)
+        }
+
+        // Lägger till antalet cells i listan
+        while (i < numberofcells)
+        {
+            Cells.push({
+            x: random(totalWidth),
+            y: random(totalHeight),
+            maxhp: 200,
+            hp: 200,
+            speed: random(6,12)});
+            i += 1;
+        }
+
+        var audio1 = new Audio('theme.mp3');
+        audio1.play();
+
+        function update()
+        {
+            clearScreen();
+
+            // Skapar Spelarna
+            circle(plr1.x, plr1.y, random(15,25), "blue");
+            circle(plr2.x, plr2.y, random(5,15), "yellow");
+
+            if (upgrade.active == true) {
+                rectangle(upgrade.x, upgrade.y, 25, 25, "purple");
+                if (distance(plr1.x, plr1.y, upgrade.x,upgrade.y) < 35 || distance(plr2.x, plr2.y, upgrade.x,upgrade.y) < 35)
+                {
+                    plr1.dmg = 15;
+                    upgrade.active = false;
+                };
+            };
+            // Player Movement
+            if (keyboard.d)
+                plr1.x += plr1.speed;
+            if (keyboard.a)
+                plr1.x -= plr1.speed;
+            if (keyboard.s)
+                plr1.y += plr1.speed;
+            if (keyboard.w)
+                plr1.y -= plr1.speed;
+            
+
+            if (keyboard.right)
+                plr2.x += plr2.speed;
+            if (keyboard.left)
+                plr2.x -= plr2.speed;
+            if (keyboard.down)
+                plr2.y += plr2.speed;
+            if (keyboard.up)
+                plr2.y -= plr2.speed;
+
+            var i = 0;
+
+            if (plr1.hp <= 0) {
+                alert("Du Förlorade!"); // Spelaren förlorar när den har för lite hp kvar
+                stopUpdate(); 
+            }
+
+            while (i < numberofcells) // Loopar igenom alla celler
+            {
+
+                var Cell = Cells[i]; // Väljer den nuvarande cellen som loopas över
+                
+                if (Cell.hp <= 0) {
+                alert("Du Vann!"); // Spelaren vinner ifall cellen har för lite hp
+                stopUpdate();
+            }
+
+                if (keyboard.space) {
+                    var audio = new Audio('shoot.mp3');
+                    audio.play();
+                    if (distance(mouse.x,mouse.y, Cell.x,Cell.y) < 40) { 
+                        Cell.hp -= plr1.dmg; // Skadar Fienden när spelaren skjuter på 
+                        plr1.points += 1; // Lägger till poäng
+                        document.getElementById("Points").innerHTML = plr1.points; // Visar poäng
+                    };
+                };
+
+                rectangle(Cell.x, Cell.y, random(60,80), random(60,80), "red"); // Skapar fienden
+
+                rectangle(15, 900, plr1.maxhp, 30, "red"); // skapar den röda delen backom health baren
+                rectangle(15, 900, plr1.maxhp * (plr1.hp/plr1.maxhp), 30, "green"); // Skapar spelarens health bar
+
+                rectangle(1700, 900, Cell.maxhp, 30, "red"); // skapar den röda delen backom health baren
+                rectangle(1700, 900, Cell.maxhp * (Cell.hp/Cell.maxhp), 30, "green"); // Skapar fiendens health bar
+
+                // Cell Movement
+                if (Cell.x < plr1.x)
+                    Cell.x += Cell.speed;
+                else
+                    Cell.x -= Cell.speed; 
+
+                if (Cell.y < plr1.y)
+                    Cell.y += Cell.speed;
+                else
+                    Cell.y -= Cell.speed;
+                
+                if (distance(plr1.x, plr1.y, Cell.x,Cell.y) < 35 || distance(plr2.x, plr2.y, Cell.x,Cell.y) < 35)
+                {
+                    plr1.hp -= 1; // Skadar spelarna ifall spelare 1 eller spelare 2 är för nära 
+                };
+                i += 1;
+            }
+        }
+    </script>
+</body>
+</html>
